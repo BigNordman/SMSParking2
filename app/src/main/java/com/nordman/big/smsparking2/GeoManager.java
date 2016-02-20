@@ -42,11 +42,10 @@ public class GeoManager {
 
     private Point getCurrentPoint(GoogleApiClient mGoogleApiClient) {
         Point result = null;
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            if (mLastLocation != null) {
-                result = factory.createPoint(new Coordinate(mLastLocation.getLatitude(),mLastLocation.getLongitude()));
-            }
+
+        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (mLastLocation != null) {
+            result = factory.createPoint(new Coordinate(mLastLocation.getLatitude(),mLastLocation.getLongitude()));
         }
         return result;
     }

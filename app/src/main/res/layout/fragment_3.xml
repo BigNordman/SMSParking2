@@ -26,7 +26,7 @@
             android:id="@+id/imageView3"
             android:src="@drawable/icon_car" />
 
-        <EditText
+        <TextView
             android:layout_width="201dp"
             android:layout_height="60dp"
             android:id="@+id/regNumText"
@@ -49,7 +49,7 @@
             android:id="@+id/imageView4"
             android:src="@drawable/icon_parking" />
 
-        <EditText
+        <TextView
             android:layout_width="201dp"
             android:layout_height="60dp"
             android:id="@+id/parkNumText"
@@ -72,7 +72,7 @@
             android:id="@+id/imageView5"
             android:src="@drawable/icon_clock" />
 
-        <EditText
+        <TextView
             android:layout_width="201dp"
             android:layout_height="60dp"
             android:id="@+id/hourText"
