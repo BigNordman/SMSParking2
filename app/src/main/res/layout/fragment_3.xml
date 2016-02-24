@@ -18,7 +18,8 @@
         android:layout_width="match_parent"
         android:layout_marginTop="20dp"
         android:layout_height="53dp"
-        android:gravity="center_horizontal">
+        android:gravity="center_horizontal"
+        android:weightSum="1">
 
         <ImageView
             android:layout_width="70dp"
@@ -27,13 +28,14 @@
             android:src="@drawable/icon_car" />
 
         <TextView
-            android:layout_width="201dp"
+            android:layout_width="200dp"
             android:layout_height="60dp"
             android:id="@+id/regNumText"
             android:textSize="35sp"
             android:textCursorDrawable="@null"
             android:textColor="@color/colorMaterialGrey"
-            android:focusable="false" />
+            android:focusable="false"
+            android:layout_weight="0.39"/>
     </LinearLayout>
 
     <LinearLayout
@@ -41,7 +43,8 @@
         android:layout_width="match_parent"
         android:layout_marginTop="20dp"
         android:layout_height="53dp"
-        android:gravity="center_horizontal">
+        android:gravity="center_horizontal"
+        android:weightSum="1">
 
         <ImageView
             android:layout_width="70dp"
@@ -50,13 +53,14 @@
             android:src="@drawable/icon_parking" />
 
         <TextView
-            android:layout_width="201dp"
+            android:layout_width="200dp"
             android:layout_height="60dp"
             android:id="@+id/parkNumText"
             android:textSize="35sp"
             android:textCursorDrawable="@null"
             android:textColor="@color/colorMaterialGrey"
-            android:focusable="false" />
+            android:focusable="false"
+            android:layout_weight="0.39"/>
     </LinearLayout>
 
     <LinearLayout
@@ -64,7 +68,8 @@
         android:layout_width="match_parent"
         android:layout_marginTop="20dp"
         android:layout_height="53dp"
-        android:gravity="center_horizontal">
+        android:gravity="center_horizontal"
+        android:weightSum="1">
 
         <ImageView
             android:layout_width="70dp"
@@ -73,13 +78,15 @@
             android:src="@drawable/icon_clock" />
 
         <TextView
-            android:layout_width="201dp"
+            android:layout_width="200dp"
             android:layout_height="60dp"
             android:id="@+id/hourText"
             android:textSize="35sp"
             android:textCursorDrawable="@null"
             android:textColor="@color/colorMaterialGrey"
-            android:focusable="false" />
+            android:focusable="false"
+            android:text=""
+            android:layout_weight="0.39" />
     </LinearLayout>
 
     <Button

@@ -6,4 +6,15 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="backspace"><![CDATA[<-]]></string>
+    <string name="undefined">Не определен</string>
+    <string name="parking_undefined">Паркинг не определен</string>
+
+    <string name="smsNumber">3116</string>
+    <string name="sendSmsFailed">Не обнаружено исходящее СМС</string>
+    <string name="sendSmsWaiting">Ожидаем СМС с подтверждением платежа</string>
+    <string name="incomingSmsFailed">Не обнаружено входящее СМС</string>
+    <string name="outgoingSmsWaiting">Ожидаем отправки смс</string>
+    <string name="incomingSmsWaiting">Ожидаем получения смс</string>
+    <string name="smsOrderPaid">Заказ оплачен</string>
+
 </resources>

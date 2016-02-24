@@ -4,7 +4,11 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.os.Handler;
+import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 
 import android.support.v4.app.Fragment;
@@ -33,7 +37,9 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
@@ -48,6 +54,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     static final int PAGE_COUNT = 3;
     public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 5000;
     public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 5;
+    public static final long TICK_INTERVAL = 1000;
+    public static final long MAX_TICK_WAITING = 60;
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
@@ -57,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     SmsManager smsMgr = new SmsManager(this);
     GeoManager geoMgr = new GeoManager(this);
     SparseArray<View> views = new SparseArray<>();
+    Timer tick = null;
+
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -126,14 +136,31 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     protected void onStart() {
         Log.d("LOG", "...onStart...");
         mGoogleApiClient.connect();
-/*
+
         if (tick==null){
             tick = new Timer();
             tick.schedule(new UpdateTickTask(), 0, TICK_INTERVAL); //тикаем каждую секунду
         }
-*/
+
         super.onStart();
     }
+
+    @Override
+    protected void onStop() {
+        Log.d("LOG", "onStop...");
+        super.onStop();
+        if(mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+
+        if (tick!=null) {
+            tick.cancel();
+            tick = null;
+        }
+
+        smsMgr.saveState();
+    }
+
 
     @Override
     protected void onResume() {
@@ -209,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.d("LOG", "...onConnectionFailed...");
     }
 
@@ -299,6 +326,26 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         };
 
+        private View.OnClickListener buttonHourListener = new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                MainActivity mainActivity = (MainActivity)getActivity();
+                SmsManager smsMgr = mainActivity.smsMgr;
+
+                if (smsMgr.appStatus==SmsManager.STATUS_SMS_NOT_SENT) smsMgr.appStatus=SmsManager.STATUS_INITIAL;
+
+                if (v.getId()==R.id.buttonPlus) {
+                    smsMgr.hours = String.valueOf((Integer.parseInt(smsMgr.hours) + 1));
+                } else {
+                    smsMgr.hours = String.valueOf((Integer.parseInt(smsMgr.hours) - 1));
+                }
+
+                Log.d("LOG","smsMgr.hours = " + smsMgr.hours );
+
+                smsMgr.saveState();
+                mainActivity.updateView();
+            }
+        };
 
         public PlaceholderFragment() {
         }
@@ -370,6 +417,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
                     (rootView.findViewById(R.id.buttonList)).setOnClickListener(buttonListListener);
                     (rootView.findViewById(R.id.buttonGPS)).setOnClickListener(buttonGPSListener);
+                    (rootView.findViewById(R.id.buttonPlus)).setOnClickListener(buttonHourListener);
+                    (rootView.findViewById(R.id.buttonMinus)).setOnClickListener(buttonHourListener);
 
                     ((MainActivity)getActivity()).views.append(position, rootView);
                     break;
@@ -414,17 +463,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             int key = views.keyAt(i);
             // get the object by the key.
             View view = views.get(key);
-            switch (key){
+            switch (key) {
                 case 1:
                     // Рег. номер
                     ((TextView) view.findViewById(R.id.regNumText)).setText(smsMgr.regNum);
                     // Клавиатура
-                    switch(smsMgr.regNum.length()) {
+                    switch (smsMgr.regNum.length()) {
                         case 0:
                         case 4:
                         case 5:
-                            setLettersEnabled(view,true);
-                            setDigitsEnabled(view,false);
+                            setLettersEnabled(view, true);
+                            setDigitsEnabled(view, false);
                             break;
                         case 1:
                         case 2:
@@ -432,12 +481,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         case 6:
                         case 7:
                         case 8:
-                            setLettersEnabled(view,false);
-                            setDigitsEnabled(view,true);
+                            setLettersEnabled(view, false);
+                            setDigitsEnabled(view, true);
                             break;
                         default:
-                            setLettersEnabled(view,false);
-                            setDigitsEnabled(view,false);
+                            setLettersEnabled(view, false);
+                            setDigitsEnabled(view, false);
                             break;
                     }
                     break;
@@ -449,16 +498,43 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         zoneDesc.setText(smsMgr.currentZone.getZoneDesc());
                         zoneDesc.setTextColor(Color.BLACK);
                     } else {
-                        zoneDesc.setText("Паркинг не определен");
+                        zoneDesc.setText(R.string.parking_undefined);
                         zoneDesc.setTextColor(Color.RED);
+                    }
+
+                    if (Integer.parseInt(smsMgr.hours) <= 1) {
+                        (view.findViewById(R.id.buttonMinus)).setEnabled(false);
+                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " час");
+                    } else if (Integer.parseInt(smsMgr.hours) >= 3) {
+                        (view.findViewById(R.id.buttonPlus)).setEnabled(false);
+                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " часа");
+                    } else {
+                        (view.findViewById(R.id.buttonMinus)).setEnabled(true);
+                        (view.findViewById(R.id.buttonPlus)).setEnabled(true);
+                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " часа");
                     }
                     break;
                 case 3:
+                    (view.findViewById(R.id.buttonPay)).setEnabled(true);
+                    ((TextView) view.findViewById(R.id.regNumText)).setText(smsMgr.regNum);
+                    TextView parkNumText =(TextView) view.findViewById(R.id.parkNumText);
+                    if (smsMgr.currentZone != null) {
+                        parkNumText.setText(smsMgr.currentZone.getZoneNumber().toString());
+                        parkNumText.setTextColor(ContextCompat.getColor(this, R.color.colorMaterialGrey));
+
+                    } else {
+                        parkNumText.setText(R.string.undefined);
+                        parkNumText.setTextColor(Color.RED);
+                        (view.findViewById(R.id.buttonPay)).setEnabled(false);
+                    }
+
+                    if (Integer.parseInt(smsMgr.hours) == 1) ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " час");
+                    else ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " часа");
+
                     break;
+                }
             }
         }
-
-        //((TextView) this.findViewById(R.id.regNumText)).setText(smsMgr.regNum);
 
         /*
         smsMgr.updateSms();
@@ -519,7 +595,70 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 break;
         }
         */
+
+    private class UpdateTickTask extends TimerTask {
+        public void run() {
+            tickHandler.sendEmptyMessage(0);
+        }
     }
+
+    final Handler tickHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            // обрабатываем сообщение таймера
+            Log.d("LOG", "***tick! ");
+
+            if(smsMgr.appStatus==SmsManager.STATUS_WAITING_OUT){
+                // ждем исходящее смс
+                Log.d("LOG", "***ждем исходящее смс");
+
+                if (smsMgr.IsSent(getResources().getString(R.string.smsNumber))){
+                    // обнаружили, что смс отправлена. Меняем статус на ожидание входящего смс
+                    smsMgr.appStatus=SmsManager.STATUS_WAITING_IN;
+                    smsMgr.sendDate = new Date();
+                }
+
+
+
+                if ((int)((new Date().getTime()-smsMgr.sendDate.getTime())/TICK_INTERVAL)>=MAX_TICK_WAITING){
+                    // время ожидания исходящего смс истекло
+                    smsMgr.appStatus=SmsManager.STATUS_SMS_NOT_SENT;
+                }
+            }
+
+            if(smsMgr.appStatus==SmsManager.STATUS_WAITING_IN){
+                // ждем входящее смс
+                Log.d("LOG", "***ждем входящее смс");
+
+                String smsText = smsMgr.GetIncomingSms(getResources().getString(R.string.smsNumber));
+                if (smsText!=null){
+                    // какая-то смс с искомого номера пришла...
+                    if (smsText.indexOf(getResources().getString(R.string.smsOrderPaid))==0){
+                        // если смс именно с подтверждением оплаты, то меняем интерфейс на "припарковано"
+                        smsMgr.sendDate = new Date();
+                        smsMgr.startParkingDate = smsMgr.sendDate;
+                        smsMgr.appStatus = SmsManager.STATUS_PARKING;
+                        smsMgr.saveState();
+                        smsMgr.startParking();
+                    } else {
+                        // если какая-то другая смс - просто выводим ее содержимое
+                        smsMgr.statusMessage = smsText;
+                        smsMgr.appStatus = SmsManager.STATUS_INITIAL;
+                    }
+
+                }
+                if ((int)((new Date().getTime()-smsMgr.sendDate.getTime())/TICK_INTERVAL)>=(MAX_TICK_WAITING*5)){
+                    // время ожидания исходящего смс истекло
+                    smsMgr.appStatus=SmsManager.STATUS_SMS_NOT_RECEIVED;
+                }
+
+            }
+
+            updateView();
+            return false;
+        }
+    });
+
 
     private void setLettersEnabled(View view, boolean flag) {
         (view.findViewById(R.id.buttonA)).setEnabled(flag);

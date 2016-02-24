@@ -101,7 +101,7 @@
             android:textColor="#FFFFFF"
             android:textSize="30sp"/>
         <EditText
-            android:layout_width="80dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:id="@+id/hourText"
             android:text="1 час"

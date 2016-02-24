@@ -12,6 +12,7 @@ import java.util.Date;
 
 /**
  * Created by s_vershinin on 15.01.2016.
+ * Класс для формирования целевого СМС-сообщения
  */
 public class SmsManager{
     public static final long MILLIS_IN_HOUR = 3600000;
@@ -34,6 +35,7 @@ public class SmsManager{
     String regNum = "";
     ParkZone currentZone = null;
     String hours = "1";
+    String statusMessage = "";
 
     public SmsManager(Context context) {
         this.context = context;

@@ -37,11 +37,17 @@ public class GeoManager {
     }
 
     public String getCoordinates(GoogleApiClient mGoogleApiClient) {
-        return this.getCurrentPoint(mGoogleApiClient).toString();
+        Point currentPoint = this.getCurrentPoint(mGoogleApiClient);
+        if (currentPoint!=null) return this.getCurrentPoint(mGoogleApiClient).toString();
+        else return "";
     }
 
     private Point getCurrentPoint(GoogleApiClient mGoogleApiClient) {
         Point result = null;
+
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return null;
+        }
 
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (mLastLocation != null) {
@@ -51,7 +57,7 @@ public class GeoManager {
     }
 
     public ArrayList<ParkZone> getParkZoneList(){
-        ArrayList<ParkZone> result = new ArrayList<ParkZone>();
+        ArrayList<ParkZone> result = new ArrayList<>();
         ArrayList<Coordinate> coords = null;
         Polygon polygon;
         Integer zoneNumber = null;
@@ -67,7 +73,7 @@ public class GeoManager {
                         switch (xpp.getName()) {
                             case "zone":
                                 // массив точек полигона. Пустой
-                                coords = new ArrayList<Coordinate>();
+                                coords = new ArrayList<>();
                                 zoneNumber = Integer.parseInt(xpp.getAttributeValue(null,"zone_number")) ;
                                 zoneDesc = xpp.getAttributeValue(null,"zone_desc");
                                 break;
