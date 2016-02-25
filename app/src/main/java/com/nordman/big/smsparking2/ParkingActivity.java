@@ -47,14 +47,11 @@ public class ParkingActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        if (smsMgr.currentZone!=null) {
-            ((TextView) this.findViewById(R.id.zoneText)).setText(smsMgr.currentZone.getZoneDesc());
-        }
         if (smsMgr.startParkingDate!=null) {
             Log.d("LOG", "smsMgr.startParkingDate = " + smsMgr.startParkingDate);
 
             DateFormat df = new SimpleDateFormat("kk:mm");
-            ((TextView) this.findViewById(R.id.beginText)).setText("Парковка с " + df.format(smsMgr.startParkingDate));
+            ((TextView) this.findViewById(R.id.timerText)).setText("ПАРКОВКА С " + df.format(smsMgr.startParkingDate));
 
             Log.d("LOG", "smsMgr.startParkingDate formatted = " + df.format(smsMgr.startParkingDate));
         }

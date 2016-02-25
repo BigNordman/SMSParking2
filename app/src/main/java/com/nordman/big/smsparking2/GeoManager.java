@@ -28,6 +28,7 @@ import java.util.ArrayList;
 
 
 public class GeoManager {
+    Boolean connected = false;
     Context context;
     GeometryFactory factory;
 
@@ -38,7 +39,7 @@ public class GeoManager {
 
     public String getCoordinates(GoogleApiClient mGoogleApiClient) {
         Point currentPoint = this.getCurrentPoint(mGoogleApiClient);
-        if (currentPoint!=null) return this.getCurrentPoint(mGoogleApiClient).toString();
+        if (currentPoint!=null) return currentPoint.toString();
         else return "";
     }
 

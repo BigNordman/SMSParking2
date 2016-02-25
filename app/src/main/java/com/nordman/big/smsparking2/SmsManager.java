@@ -168,10 +168,8 @@ public class SmsManager{
     }
 
     public  void showParkingScreen() {
-        /*
         Intent intent = new Intent(context, ParkingActivity.class);
         context.startActivity(intent);
-        */
     }
 
     public  void showMainScreen() {

@@ -49,6 +49,7 @@
             android:layout_height="wrap_content"
             android:text="Определить по GPS"
             android:id="@+id/buttonGPS"
+            android:enabled="false"
             android:background="@drawable/button_customize"
             android:textColor="#FFFFFF"
             android:textSize="15sp"

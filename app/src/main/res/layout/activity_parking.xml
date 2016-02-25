@@ -62,6 +62,7 @@
             android:text="ПАРКОВКА С "
             android:id="@+id/timerText"
             android:textSize="@dimen/text_size_large"
+            android:textColor="@color/colorMaterialGrey"
             android:layout_gravity="center_horizontal"
             android:textAlignment="center" />
 
@@ -74,12 +75,10 @@
             circular:cpb_title="112 мин"
             circular:cpb_subtitle="осталось"
             circular:cpb_progressColor="@color/colorPrimary"
-            circular:cpb_titleColor="@color/colorPrimary"
-            circular:cpb_subtitleColor="@color/colorPrimary"
+            circular:cpb_titleColor="@color/colorMaterialGrey"
+            circular:cpb_subtitleColor="@color/colorMaterialGrey"
             android:progress="56"
-            android:layout_gravity="center_horizontal"
-            android:layout_below="@+id/beginText"
-            android:layout_centerHorizontal="true"/>
+            android:layout_gravity="center_horizontal"/>
 
         <Button
             android:id="@+id/stopParkingButton"
@@ -97,8 +96,7 @@
             android:onClick="stopParkingButtonOnClick"
             android:layout_width="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:padding="5dp"
-            android:layout_below="@+id/circularprogressbar1"/>
+            android:padding="5dp"/>
         <!--
                 <Button
                     android:text="Q"
