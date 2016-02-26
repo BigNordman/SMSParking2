@@ -23,10 +23,11 @@ import java.util.TimerTask;
 
 
 public class ParkingActivity extends Activity {
-    private static final long MILLIS_IN_MINUTE = 60000;
+    private static final long TICK_INTERVAL = 5000;
 
     SmsManager smsMgr;
     Timer timer = null;
+    AdView mAdView = null;
 
 
     @Override
@@ -41,10 +42,10 @@ public class ParkingActivity extends Activity {
 
         if (timer==null){
             timer = new Timer();
-            timer.schedule(new UpdateTimeTask(), 0, MILLIS_IN_MINUTE); //тикаем каждую минуту
+            timer.schedule(new UpdateTimeTask(), 0, TICK_INTERVAL); //тикаем каждые 5 сек
         }
 
-        AdView mAdView = (AdView) findViewById(R.id.adView);
+        mAdView = (AdView) findViewById(R.id.adView);
         //AdRequest adRequest = new AdRequest.Builder().build();
 
         AdRequest adRequest = new AdRequest.Builder()
@@ -65,19 +66,13 @@ public class ParkingActivity extends Activity {
 
             Log.d("LOG", "smsMgr.startParkingDate formatted = " + df.format(smsMgr.startParkingDate));
         }
-
-        // если произошло возвращение из смс-приложения, то проверим, была ли отослана смс
-        if (smsMgr.appStatus==SmsManager.STATUS_WAITING_OUT){
-            if(smsMgr.IsSent(getResources().getString(R.string.smsNumber))) {
-                // смс о досрочном прекращении отослана - возвращаемся на стартовый экран
-                smsMgr.stopParking();
-                smsMgr.appStatus=SmsManager.STATUS_INITIAL;
-                smsMgr.saveState();
-                finish();
-            }
-        }
     }
 
+    @Override
+    protected void onStop() {
+        Log.d("LOG","...onStop...");
+        super.onStop();
+    }
 
     private void setProgress() {
         CircularProgressBar pb = (CircularProgressBar) findViewById(R.id.circularprogressbar1);
@@ -105,6 +100,21 @@ public class ParkingActivity extends Activity {
         public boolean handleMessage(Message msg) {
             // обрабатываем сообщение таймера
             setProgress();
+
+            // если произошло возвращение из смс-приложения, то проверим, была ли отослана смс
+            if (smsMgr.appStatus==SmsManager.STATUS_WAITING_OUT){
+                if(smsMgr.IsSent(getResources().getString(R.string.smsNumber))) {
+                    // смс о досрочном прекращении отослана - возвращаемся на стартовый экран
+                    Log.d("LOG","...Парковка завершена досрочно...");
+                    smsMgr.stopParking();
+                    smsMgr.appStatus=SmsManager.STATUS_INITIAL;
+                    smsMgr.saveState();
+                    mAdView.destroy();
+
+                    finish();
+                }
+            }
+
             return false;
         }
     });
@@ -124,6 +134,7 @@ public class ParkingActivity extends Activity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
             moveTaskToBack(true);
+            mAdView.destroy();
             finish();
         }
         return super.onKeyDown(keyCode, event);
