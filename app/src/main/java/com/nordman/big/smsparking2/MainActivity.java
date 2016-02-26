@@ -149,10 +149,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     protected void onResume() {
+        Log.d("LOG", "...onResume...");
+        smsMgr.restoreState();
 
         if (smsMgr.parkingActive()){
             Log.d("LOG", "smsMgr.parkingActive...");
             smsMgr.showParkingScreen();
+        } else {
+            if (smsMgr.appStatus==SmsManager.STATUS_PARKING) {
+                smsMgr.appStatus=SmsManager.STATUS_INITIAL;
+                smsMgr.saveState();
+            }
         }
 
         super.onResume();
@@ -335,6 +342,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void onClick(View v) {
                 MainActivity mainActivity = (MainActivity)getActivity();
                 SmsManager smsMgr = mainActivity.smsMgr;
+                smsMgr.updateSms();
+                Log.d("LOG", "sms = " + smsMgr.sms);
                 Uri uri = Uri.parse("smsto:" + getResources().getString(R.string.smsNumber));
                 Intent it = new Intent(Intent.ACTION_SENDTO, uri);
                 it.putExtra("sms_body", smsMgr.sms);

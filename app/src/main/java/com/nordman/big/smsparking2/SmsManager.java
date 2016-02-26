@@ -42,13 +42,10 @@ public class SmsManager{
     }
 
     public void updateSms() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
         sms = "p66*";
-        regNum = prefs.getString("regnum", "________");
 
         if (currentZone==null) {
-            sms += "___*";
+            sms += "*";
         } else {
             sms += currentZone.getZoneNumber().toString() + "*";
         }

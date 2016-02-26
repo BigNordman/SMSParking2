@@ -11,6 +11,8 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.lylc.widget.circularprogressbar.CircularProgressBar;
 
 import java.text.DateFormat;
@@ -32,7 +34,6 @@ public class ParkingActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_parking);
 
-        Intent i = getIntent();
         smsMgr = new SmsManager(this);
         smsMgr.restoreState();
 
@@ -42,6 +43,15 @@ public class ParkingActivity extends Activity {
             timer = new Timer();
             timer.schedule(new UpdateTimeTask(), 0, MILLIS_IN_MINUTE); //тикаем каждую минуту
         }
+
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        //AdRequest adRequest = new AdRequest.Builder().build();
+
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("93D1A3842F58520E64C8C72C4A9B897C")
+                .build();
+
+        mAdView.loadAd(adRequest);
     }
 
     protected void onResume() {

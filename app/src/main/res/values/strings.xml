@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SMSParking2</string>
+    <string name="app_name">СМС Паркинг Екатеринбург</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
 
@@ -17,5 +17,8 @@
     <string name="incomingSmsWaiting">Ожидаем получения смс</string>
     <string name="smsOrderPaid">Заказ оплачен</string>
     <string name="stopParkingButtonText">Прекратить досрочно</string>
+
+    <string name="banner_ad_unit_id">ca-app-pub-1197415712484000/7018925775</string>
+    <string name="admob_publisher_id">pub-1197415712484000</string>
 
 </resources>
