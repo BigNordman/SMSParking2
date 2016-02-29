@@ -34,11 +34,13 @@
                 android:layout_height="wrap_content"
                 android:textSize="24sp"
                 android:textColor="@android:color/white"
+                android:layout_marginLeft="8dp"
                 android:text="СМС Паркинг"/>
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:src="@drawable/ic_logo"
+                android:layout_marginRight="8dp"
                 android:scaleType="fitEnd"/>
         </android.support.v7.widget.LinearLayoutCompat>
 
@@ -107,25 +109,26 @@
             android:layout_below="@+id/circularprogressbar1"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="49dp" />
-        <!--
+
                 <Button
                     android:text="Q"
-                    android:id="@+id/qButton"
+                    android:id="@+id/qButton1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:onClick="qButtonOnClick"
+                    android:onClick="qButton1OnClick"
                     android:layout_below="@+id/stopParkingButton"
                     android:layout_centerHorizontal="true"
-                    />
-        -->
-        <com.google.android.gms.ads.AdView
+                    android:visibility="invisible" />
+
+            <com.google.android.gms.ads.AdView
             android:id="@+id/adView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             ads:adSize="BANNER"
-            ads:adUnitId="@string/banner_ad_unit_id">
+            ads:adUnitId="@string/banner_ad_unit_id"
+            android:visibility="visible">
         </com.google.android.gms.ads.AdView>
 </RelativeLayout>
 

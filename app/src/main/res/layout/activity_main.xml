@@ -34,10 +34,12 @@
                 android:layout_height="wrap_content"
                 android:textSize="24sp"
                 android:textColor="@android:color/white"
+                android:layout_marginLeft="8dp"
                 android:text="СМС Паркинг"/>
             <ImageView
             android:layout_width="match_parent"
             android:layout_height="30dp"
+            android:layout_marginRight="8dp"
             android:src="@drawable/ic_logo"
             android:scaleType="fitEnd"/>
         </android.support.v7.widget.LinearLayoutCompat>

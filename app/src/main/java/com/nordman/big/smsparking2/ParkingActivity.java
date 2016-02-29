@@ -46,11 +46,13 @@ public class ParkingActivity extends Activity {
         }
 
         mAdView = (AdView) findViewById(R.id.adView);
-        //AdRequest adRequest = new AdRequest.Builder().build();
+        AdRequest adRequest = new AdRequest.Builder().build();
 
+        /*
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice("93D1A3842F58520E64C8C72C4A9B897C")
                 .build();
+        */
 
         mAdView.loadAd(adRequest);
     }
@@ -84,6 +86,8 @@ public class ParkingActivity extends Activity {
             smsMgr.stopParking();
             smsMgr.appStatus=SmsManager.STATUS_INITIAL;
             smsMgr.saveState();
+            mAdView.destroy();
+
             finish();
         }
     }
@@ -140,10 +144,11 @@ public class ParkingActivity extends Activity {
         return super.onKeyDown(keyCode, event);
     }
 
-    public void qButtonOnClick(View view) {
+    public void qButton1OnClick(View view) {
         smsMgr.stopParking();
         smsMgr.appStatus=SmsManager.STATUS_INITIAL;
         smsMgr.saveState();
+        mAdView.destroy();
         finish();
     }
 
