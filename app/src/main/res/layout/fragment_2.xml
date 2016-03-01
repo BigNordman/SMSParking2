@@ -47,24 +47,24 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Определить по GPS"
+            android:text="Определить&#10; по GPS"
             android:id="@+id/buttonGPS"
             android:enabled="false"
             android:background="@drawable/button_customize"
             android:textColor="#FFFFFF"
-            android:textSize="15sp"
-            android:padding="5dp"
+            android:textSize="20sp"
+            android:padding="8dp"
             android:layout_margin="5dp"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Выбрать из списка"
+            android:text="Выбрать из&#10; списка"
             android:id="@+id/buttonList"
             android:background="@drawable/button_customize"
             android:textColor="#FFFFFF"
-            android:textSize="15sp"
-            android:padding="5dp"
+            android:textSize="20sp"
+            android:padding="8dp"
             android:layout_margin="5dp"/>
     </LinearLayout>
     <TextView
