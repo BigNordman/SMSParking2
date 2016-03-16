@@ -623,7 +623,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 // ждем входящее смс
                 Log.d("LOG", "***ждем входящее смс");
 
-                String smsText = smsMgr.GetIncomingSms(getResources().getString(R.string.smsNumber));
+                String smsText = smsMgr.GetIncomingSms(null);
                 if (smsText!=null){
                     // какая-то смс с искомого номера пришла...
                     if (smsText.indexOf(getResources().getString(R.string.smsOrderPaid))==0){

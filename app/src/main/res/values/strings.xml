@@ -15,7 +15,7 @@
     <string name="incomingSmsFailed">Не обнаружено входящее СМС</string>
     <string name="outgoingSmsWaiting">Ожидаем отправки смс</string>
     <string name="incomingSmsWaiting">Ожидаем получения смс</string>
-    <string name="smsOrderPaid">Заказ оплачен</string>
+    <string name="smsOrderPaid">списано</string>
     <string name="stopParkingButtonText">Прекратить досрочно</string>
 
     <string name="banner_ad_unit_id">ca-app-pub-1197415712484000/7018925775</string>

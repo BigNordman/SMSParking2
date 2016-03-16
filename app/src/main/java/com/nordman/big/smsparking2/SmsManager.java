@@ -118,7 +118,7 @@ public class SmsManager{
 
         Cursor c = cr.query(Telephony.Sms.Inbox.CONTENT_URI, // Official CONTENT_URI from docs
                 new String[]{Telephony.Sms.Inbox.DATE, Telephony.Sms.Inbox.ADDRESS, Telephony.Sms.Inbox.BODY}, // Select body text
-                Telephony.Sms.Inbox.ADDRESS + " = '" + fromWhom + "'",
+                (fromWhom==null) ? null : Telephony.Sms.Inbox.ADDRESS + " = '" + fromWhom + "'",
                 null,
                 Telephony.Sms.Inbox.DEFAULT_SORT_ORDER); // Default sort order
 
