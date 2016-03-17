@@ -642,7 +642,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
                 }
                 Log.d("LOG","тиков ожидания: " + (int)((new Date().getTime()-smsMgr.sendDate.getTime())/TICK_INTERVAL));
-                if ((int)((new Date().getTime()-smsMgr.sendDate.getTime())/TICK_INTERVAL)>=(MAX_TICK_WAITING*3)){
+                if ((int)((new Date().getTime()-smsMgr.sendDate.getTime())/TICK_INTERVAL)>=(MAX_TICK_WAITING*2)){
                     // время ожидания исходящего смс истекло - все равно переходим на интерфейс "припарковано"
                     /*
                     smsMgr.appStatus=SmsManager.STATUS_SMS_NOT_RECEIVED;

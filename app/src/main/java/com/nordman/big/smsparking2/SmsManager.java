@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.Telephony;
 
@@ -87,11 +88,11 @@ public class SmsManager{
 
         ContentResolver cr = context.getContentResolver();
 
-        Cursor c = cr.query(Telephony.Sms.Sent.CONTENT_URI, // Official CONTENT_URI from docs
-                new String[]{Telephony.Sms.Sent.DATE, Telephony.Sms.Sent.ADDRESS, Telephony.Sms.Sent.BODY}, // Select body text
-                Telephony.Sms.Sent.ADDRESS + " = '" + toWhom + "'",
+        Cursor c = cr.query(Uri.parse("content://sms/sent"),
+                new String[] { "date", "address", "body" },
+                "address = '" + toWhom + "'",
                 null,
-                Telephony.Sms.Sent.DEFAULT_SORT_ORDER); // Default sort order
+                "date DESC");
 
         assert c != null;
         int totalSMS = c.getCount();
@@ -115,12 +116,11 @@ public class SmsManager{
         String result = null;
 
         ContentResolver cr = context.getContentResolver();
-
-        Cursor c = cr.query(Telephony.Sms.Inbox.CONTENT_URI, // Official CONTENT_URI from docs
-                new String[]{Telephony.Sms.Inbox.DATE, Telephony.Sms.Inbox.ADDRESS, Telephony.Sms.Inbox.BODY}, // Select body text
-                (fromWhom==null) ? null : Telephony.Sms.Inbox.ADDRESS + " = '" + fromWhom + "'",
+        Cursor c = cr.query(Uri.parse("content://sms/inbox"),
+                new String[] { "date", "address", "body" },
+                (fromWhom==null) ? null : "address = '" + fromWhom + "'",
                 null,
-                Telephony.Sms.Inbox.DEFAULT_SORT_ORDER); // Default sort order
+                "date DESC");
 
         assert c != null;
         int totalSMS = c.getCount();
