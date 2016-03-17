@@ -623,10 +623,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 // ждем входящее смс
                 Log.d("LOG", "***ждем входящее смс");
 
-                String smsText = smsMgr.GetIncomingSms(null);
+                String smsText = smsMgr.GetIncomingSms(getResources().getString(R.string.smsNumber));
                 if (smsText!=null){
                     // какая-то смс с искомого номера пришла...
-                    if (smsText.indexOf(getResources().getString(R.string.smsOrderPaid))==0){
+                    if (smsText.contains(getResources().getString(R.string.smsOrderPaid))){
                         // если смс именно с подтверждением оплаты, то меняем интерфейс на "припарковано"
                         smsMgr.sendDate = new Date();
                         smsMgr.startParkingDate = smsMgr.sendDate;
@@ -642,10 +642,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
                 }
                 Log.d("LOG","тиков ожидания: " + (int)((new Date().getTime()-smsMgr.sendDate.getTime())/TICK_INTERVAL));
-                if ((int)((new Date().getTime()-smsMgr.sendDate.getTime())/TICK_INTERVAL)>=(MAX_TICK_WAITING*5)){
-                    // время ожидания исходящего смс истекло
+                if ((int)((new Date().getTime()-smsMgr.sendDate.getTime())/TICK_INTERVAL)>=(MAX_TICK_WAITING*3)){
+                    // время ожидания исходящего смс истекло - все равно переходим на интерфейс "припарковано"
+                    /*
                     smsMgr.appStatus=SmsManager.STATUS_SMS_NOT_RECEIVED;
                     smsMgr.saveState();
+                    */
+                    smsMgr.sendDate = new Date();
+                    smsMgr.startParkingDate = smsMgr.sendDate;
+                    smsMgr.appStatus = SmsManager.STATUS_PARKING;
+                    smsMgr.saveState();
+                    smsMgr.startParking();
                 }
 
             }
