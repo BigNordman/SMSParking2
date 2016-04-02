@@ -1,15 +1,10 @@
 package com.nordman.big.smsparking2;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 
@@ -32,30 +27,19 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class MainActivity extends AppCompatActivity {
 
     static final int PAGE_COUNT = 3;
-    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 5000;
-    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 5;
     public static final long TICK_INTERVAL = 1000;
     public static final long MAX_TICK_WAITING = 60;
 
-    GoogleApiClient mGoogleApiClient;
-    LocationRequest mLocationRequest;
-
     SmsManager smsMgr = new SmsManager(this);
-    GeoManager geoMgr = new GeoManager(this);
+    GeoManager geoMgr;
     SparseArray<View> views = new SparseArray<>();
     Timer tick = null;
 
@@ -65,15 +49,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (mGoogleApiClient == null) {
-            Log.d("LOG","...создаем GooglAPIClient");
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
-
+        geoMgr = new GeoManager(this);
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -120,7 +96,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onStart() {
         Log.d("LOG", "...onStart...");
-        mGoogleApiClient.connect();
+
+        geoMgr.connected=true;
+        if (smsMgr.appStatus==SmsManager.STATUS_INITIAL) {
+            smsMgr.restoreState();
+            smsMgr.currentZone = geoMgr.getParkZone();
+            smsMgr.saveState();
+        }
 
         if (tick==null){
             tick = new Timer();
@@ -134,9 +116,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     protected void onStop() {
         Log.d("LOG", "onStop...");
         super.onStop();
-        if(mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }
 
         if (tick!=null) {
             tick.cancel();
@@ -187,48 +166,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.d("LOG", "...onConnected...");
-        createLocationRequest();
-
-        geoMgr.connected=true;
-        if (smsMgr.appStatus==SmsManager.STATUS_INITIAL) {
-            smsMgr.currentZone = geoMgr.getParkZone(mGoogleApiClient);
-            smsMgr.saveState();
-        }
-
-    }
-
-    protected void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
-        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        startLocationUpdates();
-    }
-
-    protected void startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Log.d("LOG", "...onConnectionSuspended...");
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        Log.d("LOG", "...onLocationChanged...");
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.d("LOG", "...onConnectionFailed...");
-    }
 
     /**
      * A placeholder fragment containing a simple view.
@@ -304,13 +241,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 MainActivity mainActivity = (MainActivity)getActivity();
                 GeoManager geoMgr = mainActivity.geoMgr;
                 SmsManager smsMgr = mainActivity.smsMgr;
-                GoogleApiClient mGoogleApiClient = mainActivity.mGoogleApiClient;
-                Log.d("LOG", geoMgr.getCoordinates(mGoogleApiClient));
-                Toast.makeText(v.getContext(), geoMgr.getCoordinates(mGoogleApiClient), Toast.LENGTH_LONG).show();
+                Log.d("LOG", geoMgr.getCoordinates());
+                Toast.makeText(v.getContext(), geoMgr.getCoordinates(), Toast.LENGTH_LONG).show();
 
                 if ( (smsMgr.appStatus==SmsManager.STATUS_SMS_NOT_SENT) ||(smsMgr.appStatus==SmsManager.STATUS_SMS_NOT_RECEIVED)) smsMgr.appStatus=SmsManager.STATUS_INITIAL;
 
-                smsMgr.currentZone = geoMgr.getParkZone(mGoogleApiClient);
+                smsMgr.currentZone = geoMgr.getParkZone();
                 smsMgr.saveState();
                 mainActivity.updateView();
             }
@@ -469,7 +405,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     private void updateView(){
         smsMgr.restoreState();
-        Log.d("LOG","Статус = " + smsMgr.appStatus);
+        //Log.d("LOG","Статус = " + smsMgr.appStatus);
         for(int i = 0; i < views.size(); i++) {
             int key = views.keyAt(i);
             // get the object by the key.
@@ -596,7 +532,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         @Override
         public boolean handleMessage(Message msg) {
             // обрабатываем сообщение таймера
-            Log.d("LOG", "***tick! ");
+            //Log.d("LOG", "***tick! ");
 
             if(smsMgr.appStatus==SmsManager.STATUS_WAITING_OUT){
                 // ждем исходящее смс

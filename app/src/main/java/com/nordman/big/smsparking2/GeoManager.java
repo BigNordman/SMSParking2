@@ -8,12 +8,13 @@ package com.nordman.big.smsparking2;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -28,31 +29,68 @@ import java.util.ArrayList;
 
 
 public class GeoManager {
+    private Location curLocation;
     Boolean connected = false;
     Context context;
     GeometryFactory factory;
 
     public GeoManager(Context context) {
         this.context = context;
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        Criteria crta = new Criteria();
+        crta.setAccuracy(Criteria.ACCURACY_FINE);
+        crta.setAltitudeRequired(false);
+        crta.setBearingRequired(false);
+        crta.setCostAllowed(true);
+        crta.setPowerRequirement(Criteria.POWER_LOW);
+        String gpsProvider = locationManager.getBestProvider(crta, true);
+        Log.d("LOG","...Provider = " + gpsProvider + "...");
+
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            curLocation = locationManager.getLastKnownLocation(gpsProvider);
+
+            LocationListener locationListener = new LocationListener() {
+
+                @Override
+                public void onLocationChanged(Location location) {
+                    curLocation = location;
+                }
+
+                @Override
+                public void onProviderDisabled(String provider) {
+            /*
+            criticalErr = "Provider " + provider + " disabled.";
+            updateUI();
+            */
+                    //TODO: что-то сделать с ошибками
+                }
+
+                @Override
+                public void onProviderEnabled(String provider) {
+                }
+
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
+                }
+
+            };
+            locationManager.requestLocationUpdates(gpsProvider, 1000, 0, locationListener);
+        }
+
         factory = new GeometryFactory();
     }
 
-    public String getCoordinates(GoogleApiClient mGoogleApiClient) {
-        Point currentPoint = this.getCurrentPoint(mGoogleApiClient);
+    public String getCoordinates() {
+        Point currentPoint = this.getCurrentPoint();
         if (currentPoint!=null) return currentPoint.toString();
         else return "";
     }
 
-    private Point getCurrentPoint(GoogleApiClient mGoogleApiClient) {
+    private Point getCurrentPoint() {
         Point result = null;
 
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return null;
-        }
-
-        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (mLastLocation != null) {
-            result = factory.createPoint(new Coordinate(mLastLocation.getLatitude(),mLastLocation.getLongitude()));
+        if (curLocation != null) {
+            result = factory.createPoint(new Coordinate(curLocation.getLatitude(),curLocation.getLongitude()));
         }
         return result;
     }
@@ -117,9 +155,9 @@ public class GeoManager {
     }
 
 
-    public ParkZone getParkZone(GoogleApiClient mGoogleApiClient){
+    public ParkZone getParkZone(){
         ArrayList<ParkZone> zones = this.getParkZoneList();
-        Point currentPoint = this.getCurrentPoint(mGoogleApiClient);
+        Point currentPoint = this.getCurrentPoint();
 
         if (currentPoint==null) return null;
 

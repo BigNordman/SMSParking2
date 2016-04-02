@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.provider.Telephony;
 
 import java.util.Date;
 
@@ -51,15 +50,6 @@ public class SmsManager{
             sms += currentZone.getZoneNumber().toString() + "*";
         }
         sms += regNum + "*" + hours;
-    }
-
-    public String hourDesc(){
-        if (hours.equals("1")) return hours + " час";
-        else return hours + " часа";
-    }
-
-    public boolean smsComplete(){
-        return !regNum.equals("________") & currentZone != null;
     }
 
     public int getProgress(){
@@ -183,16 +173,18 @@ public class SmsManager{
         ed.putLong("startParkingDate", startParkingDate != null ? startParkingDate.getTime() : 0);
         ed.putInt("zoneNumber", currentZone != null ? currentZone.getZoneNumber() : 0);
         ed.apply();
+        //Log.d("LOG", "...saveState()...");
     }
 
     public void restoreState() {
         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(context);
-        regNum = prefs.getString("regNum","");
+        regNum = prefs.getString("regNum", "");
         appStatus = prefs.getInt("status", STATUS_INITIAL);
         sendDate = new Date(prefs.getLong("sendDate",0));
         startParkingDate = new Date(prefs.getLong("startParkingDate",0));
         //if (appStatus==STATUS_WAITING_IN || appStatus==STATUS_WAITING_OUT)
-        currentZone = new GeoManager(context).getParkZone(prefs.getInt("zoneNumber", 0));
+        currentZone = ((MainActivity) context).geoMgr.getParkZone(prefs.getInt("zoneNumber", 0));
+        //Log.d("LOG", "...restoreState()...");
     }
 }
 
