@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     public static final long TICK_INTERVAL = 1000;
     public static final long MAX_TICK_WAITING = 60;
 
-    SmsManager smsMgr = new SmsManager(this);
+    SmsManager smsMgr;
     GeoManager geoMgr;
     SparseArray<View> views = new SparseArray<>();
     Timer tick = null;
@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         geoMgr = new GeoManager(this);
+        smsMgr = new SmsManager(this);
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.

@@ -28,6 +28,8 @@ public class SmsManager{
     int appStatus = STATUS_INITIAL;
 
     Context context;
+    GeoManager geoMgr;
+
     Date sendDate;
     Date startParkingDate;
 
@@ -38,7 +40,9 @@ public class SmsManager{
     String statusMessage = "";
 
     public SmsManager(Context context) {
+
         this.context = context;
+        geoMgr = new GeoManager(context);
     }
 
     public void updateSms() {
@@ -183,7 +187,7 @@ public class SmsManager{
         sendDate = new Date(prefs.getLong("sendDate",0));
         startParkingDate = new Date(prefs.getLong("startParkingDate",0));
         //if (appStatus==STATUS_WAITING_IN || appStatus==STATUS_WAITING_OUT)
-        currentZone = ((MainActivity) context).geoMgr.getParkZone(prefs.getInt("zoneNumber", 0));
+        currentZone = geoMgr.getParkZone(prefs.getInt("zoneNumber", 0));
         //Log.d("LOG", "...restoreState()...");
     }
 }
