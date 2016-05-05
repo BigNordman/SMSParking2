@@ -74,16 +74,22 @@ public class MainActivity extends AppCompatActivity {
                         ((RadioButton) findViewById(R.id.radioButton1)).setChecked(true);
                         ((RadioButton) findViewById(R.id.radioButton2)).setChecked(false);
                         ((RadioButton) findViewById(R.id.radioButton3)).setChecked(false);
+                        findViewById(R.id.buttonLeft).setEnabled(false);
+                        findViewById(R.id.buttonRight).setEnabled(true);
                         break;
                     case 1:
                         ((RadioButton) findViewById(R.id.radioButton1)).setChecked(false);
                         ((RadioButton) findViewById(R.id.radioButton2)).setChecked(true);
                         ((RadioButton) findViewById(R.id.radioButton3)).setChecked(false);
+                        findViewById(R.id.buttonLeft).setEnabled(true);
+                        findViewById(R.id.buttonRight).setEnabled(true);
                         break;
                     case 2:
                         ((RadioButton) findViewById(R.id.radioButton1)).setChecked(false);
                         ((RadioButton) findViewById(R.id.radioButton2)).setChecked(false);
                         ((RadioButton) findViewById(R.id.radioButton3)).setChecked(true);
+                        findViewById(R.id.buttonLeft).setEnabled(true);
+                        findViewById(R.id.buttonRight).setEnabled(false);
                         break;
                 }
             }
@@ -669,4 +675,19 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    public void rightSlide(View view) {
+        slide(1);
+    }
+
+    public void leftSlide(View view) {
+        slide(-1);
+    }
+
+    private void slide(int direction) {
+        ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setCurrentItem(mViewPager.getCurrentItem()+direction);
+
+    }
+
 }
