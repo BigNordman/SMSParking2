@@ -473,9 +473,13 @@ public class MainActivity extends AppCompatActivity {
                     if (Integer.parseInt(smsMgr.hours) <= 1) {
                         (view.findViewById(R.id.buttonMinus)).setEnabled(false);
                         ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " час");
-                    } else if (Integer.parseInt(smsMgr.hours) >= 3) {
+                    } else if (Integer.parseInt(smsMgr.hours) >= 8) {
                         (view.findViewById(R.id.buttonPlus)).setEnabled(false);
-                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " часа");
+                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " часов");
+                    } else if (Integer.parseInt(smsMgr.hours) >= 5) {
+                        (view.findViewById(R.id.buttonMinus)).setEnabled(true);
+                        (view.findViewById(R.id.buttonPlus)).setEnabled(true);
+                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " часов");
                     } else {
                         (view.findViewById(R.id.buttonMinus)).setEnabled(true);
                         (view.findViewById(R.id.buttonPlus)).setEnabled(true);
@@ -496,8 +500,14 @@ public class MainActivity extends AppCompatActivity {
                         (view.findViewById(R.id.buttonPay)).setEnabled(false);
                     }
 
-                    if (Integer.parseInt(smsMgr.hours) == 1) ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " час");
-                    else ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " часа");
+                    if (Integer.parseInt(smsMgr.hours) == 1) {
+                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " час");
+                    }
+                    else if ((Integer.parseInt(smsMgr.hours) > 1) && (Integer.parseInt(smsMgr.hours) < 5)) {
+                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " часа");
+                    } else {
+                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " часов");
+                    }
 
                     switch (smsMgr.appStatus) {
                         case SmsManager.STATUS_INITIAL:
