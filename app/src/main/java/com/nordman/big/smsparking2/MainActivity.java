@@ -136,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         smsMgr.saveState();
+        geoMgr.disconnect();
     }
 
 
@@ -255,6 +256,8 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity mainActivity = (MainActivity)getActivity();
                 GeoManager geoMgr = mainActivity.geoMgr;
                 SmsManager smsMgr = mainActivity.smsMgr;
+                geoMgr.locationUpdate();
+
                 Log.d("LOG", geoMgr.getCoordinates());
                 Toast.makeText(v.getContext(), geoMgr.getCoordinates(), Toast.LENGTH_LONG).show();
 
