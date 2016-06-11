@@ -1,5 +1,5 @@
-
 package com.nordman.big.smsparking2;
+
 
 import android.Manifest;
 import android.content.Intent;
@@ -40,6 +40,7 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity {
 
     private static final int MY_PERMISSIONS_REQUEST_READ_SMS = 1;
+    private static final int PERMISSION_ACCESS_FINE_LOCATION = 2;
     static final int PAGE_COUNT = 3;
     public static final long TICK_INTERVAL = 1000;
     public static final long MAX_TICK_WAITING = 60;
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
                         ((RadioButton) findViewById(R.id.radioButton3)).setChecked(false);
                         findViewById(R.id.buttonLeft).setEnabled(false);
                         findViewById(R.id.buttonRight).setEnabled(true);
+
                         break;
                     case 1:
                         ((RadioButton) findViewById(R.id.radioButton1)).setChecked(false);
@@ -149,7 +151,6 @@ public class MainActivity extends AppCompatActivity {
             smsMgr.showParkingScreen();
         } else {
             if (smsMgr.appStatus==SmsManager.STATUS_PARKING) {
-
                 smsMgr.appStatus=SmsManager.STATUS_INITIAL;
                 smsMgr.saveState();
             }
@@ -252,9 +253,12 @@ public class MainActivity extends AppCompatActivity {
         private View.OnClickListener buttonGPSListener = new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                /*
                 MainActivity mainActivity = (MainActivity)getActivity();
                 GeoManager geoMgr = mainActivity.geoMgr;
                 SmsManager smsMgr = mainActivity.smsMgr;
+                geoMgr.locationUpdate();
+
                 Log.d("LOG", geoMgr.getCoordinates());
                 Toast.makeText(v.getContext(), geoMgr.getCoordinates(), Toast.LENGTH_LONG).show();
 
@@ -263,6 +267,15 @@ public class MainActivity extends AppCompatActivity {
                 smsMgr.currentZone = geoMgr.getParkZone();
                 smsMgr.saveState();
                 mainActivity.updateView();
+                */
+                MainActivity mainActivity = (MainActivity)getActivity();
+
+                if (ContextCompat.checkSelfPermission(mainActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(mainActivity, new String[] { Manifest.permission.ACCESS_FINE_LOCATION }, PERMISSION_ACCESS_FINE_LOCATION);
+                }
+
+                mainActivity.tryToGetParkZone();
+
             }
         };
 
@@ -473,9 +486,13 @@ public class MainActivity extends AppCompatActivity {
                     if (Integer.parseInt(smsMgr.hours) <= 1) {
                         (view.findViewById(R.id.buttonMinus)).setEnabled(false);
                         ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " час");
-                    } else if (Integer.parseInt(smsMgr.hours) >= 3) {
+                    } else if (Integer.parseInt(smsMgr.hours) >= 8) {
                         (view.findViewById(R.id.buttonPlus)).setEnabled(false);
-                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " часа");
+                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " часов");
+                    } else if (Integer.parseInt(smsMgr.hours) >= 5) {
+                        (view.findViewById(R.id.buttonMinus)).setEnabled(true);
+                        (view.findViewById(R.id.buttonPlus)).setEnabled(true);
+                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " часов");
                     } else {
                         (view.findViewById(R.id.buttonMinus)).setEnabled(true);
                         (view.findViewById(R.id.buttonPlus)).setEnabled(true);
@@ -496,8 +513,14 @@ public class MainActivity extends AppCompatActivity {
                         (view.findViewById(R.id.buttonPay)).setEnabled(false);
                     }
 
-                    if (Integer.parseInt(smsMgr.hours) == 1) ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " час");
-                    else ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " часа");
+                    if (Integer.parseInt(smsMgr.hours) == 1) {
+                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " час");
+                    }
+                    else if ((Integer.parseInt(smsMgr.hours) > 1) && (Integer.parseInt(smsMgr.hours) < 5)) {
+                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " часа");
+                    } else {
+                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " часов");
+                    }
 
                     switch (smsMgr.appStatus) {
                         case SmsManager.STATUS_INITIAL:
@@ -663,7 +686,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_READ_SMS: {
+            case MY_PERMISSIONS_REQUEST_READ_SMS:
                 // If request is cancelled, the result arrays are empty.
                 if (!(grantResults.length > 0  && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     // permission denied, boo! Disable the
@@ -672,7 +695,17 @@ public class MainActivity extends AppCompatActivity {
                     smsMgr.saveState();
                     Log.d("LOG",".......permission not granted");
                 }
-            }
+                break;
+            case PERMISSION_ACCESS_FINE_LOCATION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //Toast.makeText(this, "Location permission granted!", Toast.LENGTH_SHORT).show();
+                    Log.d("LOG",".......Location permission granted");
+                    geoMgr = new GeoManager(this);
+                    this.tryToGetParkZone();
+                } else {
+                    Toast.makeText(this, "Необходимо разрешение на определение местонахождения!", Toast.LENGTH_SHORT).show();
+                }
+                break;
         }
     }
 
@@ -690,4 +723,18 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void tryToGetParkZone(){
+        GeoManager geoMgr = this.geoMgr;
+        SmsManager smsMgr = this.smsMgr;
+        Log.d("LOG", geoMgr.getCoordinates());
+        Toast.makeText(this, geoMgr.getCoordinates(), Toast.LENGTH_LONG).show();
+
+        if ( (smsMgr.appStatus==SmsManager.STATUS_SMS_NOT_SENT) ||(smsMgr.appStatus==SmsManager.STATUS_SMS_NOT_RECEIVED)) smsMgr.appStatus=SmsManager.STATUS_INITIAL;
+
+        smsMgr.currentZone = geoMgr.getParkZone();
+
+        smsMgr.saveState();
+        this.updateView();
+
+    }
 }

@@ -4,7 +4,6 @@
  */
 
 package com.nordman.big.smsparking2;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -92,6 +91,8 @@ public class GeoManager {
         if (curLocation != null) {
             result = factory.createPoint(new Coordinate(curLocation.getLatitude(),curLocation.getLongitude()));
         }
+
+        //result = factory.createPoint(new Coordinate(55.749644,37.599726));
         return result;
     }
 
@@ -174,7 +175,7 @@ public class GeoManager {
         ArrayList<ParkZone> zones = this.getParkZoneList();
 
         for(ParkZone zone : zones){
-            if (zone.getZoneNumber()==zoneNumber){
+            if (zone.getZoneNumber() == zoneNumber){
                 return zone;
             }
         }

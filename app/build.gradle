@@ -15,8 +15,8 @@ android {
         applicationId "com.nordman.big.smsparking2"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 7
-        versionName "1.07"
+        versionCode 8
+        versionName "1.08"
     }
     buildTypes {
         release {
@@ -40,3 +40,4 @@ dependencies {
     compile project(':progress_bar')
 }
 
+apply plugin: 'com.google.gms.google-services'
