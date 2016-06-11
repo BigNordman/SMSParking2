@@ -1,6 +1,5 @@
 package com.nordman.big.smsparking2;
 
-
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -138,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         smsMgr.saveState();
-        geoMgr.disconnect();
     }
 
 
