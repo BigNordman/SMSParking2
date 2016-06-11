@@ -138,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         smsMgr.saveState();
+        geoMgr.disconnect();
     }
 
 

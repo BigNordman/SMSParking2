@@ -27,6 +27,19 @@ public class ParkingActivity extends Activity {
 
     SmsManager smsMgr;
     Timer timer = null;
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mAdView.pause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mAdView.destroy();
+        super.onDestroy();
+    }
+
     AdView mAdView = null;
 
 
@@ -59,6 +72,7 @@ public class ParkingActivity extends Activity {
 
     protected void onResume() {
         super.onResume();
+        mAdView.resume();
 
         if (smsMgr.startParkingDate!=null) {
             Log.d("LOG", "smsMgr.startParkingDate = " + smsMgr.startParkingDate);
