@@ -3,6 +3,7 @@ package com.nordman.big.smsparking2;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Handler;
@@ -33,6 +34,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -252,21 +254,6 @@ public class MainActivity extends AppCompatActivity {
         private View.OnClickListener buttonGPSListener = new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                /*
-                MainActivity mainActivity = (MainActivity)getActivity();
-                GeoManager geoMgr = mainActivity.geoMgr;
-                SmsManager smsMgr = mainActivity.smsMgr;
-                geoMgr.locationUpdate();
-
-                Log.d("LOG", geoMgr.getCoordinates());
-                Toast.makeText(v.getContext(), geoMgr.getCoordinates(), Toast.LENGTH_LONG).show();
-
-                if ( (smsMgr.appStatus==SmsManager.STATUS_SMS_NOT_SENT) ||(smsMgr.appStatus==SmsManager.STATUS_SMS_NOT_RECEIVED)) smsMgr.appStatus=SmsManager.STATUS_INITIAL;
-
-                smsMgr.currentZone = geoMgr.getParkZone();
-                smsMgr.saveState();
-                mainActivity.updateView();
-                */
                 MainActivity mainActivity = (MainActivity)getActivity();
 
                 if (ContextCompat.checkSelfPermission(mainActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -415,7 +402,7 @@ public class MainActivity extends AppCompatActivity {
      * one of the sections/tabs/pages.
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
-        public SectionsPagerAdapter(FragmentManager fm) {
+        SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
@@ -436,7 +423,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateView(){
         smsMgr.restoreState();
-        //Log.d("LOG","Статус = " + smsMgr.appStatus);
+
+        Resources res = getResources();
+
         for(int i = 0; i < views.size(); i++) {
             int key = views.keyAt(i);
             // get the object by the key.
@@ -473,7 +462,8 @@ public class MainActivity extends AppCompatActivity {
 
                     TextView zoneDesc = (TextView) this.findViewById(R.id.zoneDesc);
                     if (smsMgr.currentZone != null) {
-                        ((TextView) view.findViewById(R.id.parkNumText)).setText(smsMgr.currentZone.getZoneNumber().toString());
+                        ((TextView) view.findViewById(R.id.parkNumText)).setText(String.format(Locale.getDefault(), "%d",smsMgr.currentZone.getZoneNumber()));
+
                         zoneDesc.setText(smsMgr.currentZone.getZoneDesc());
                         zoneDesc.setTextColor(Color.BLACK);
                     } else {
@@ -484,18 +474,18 @@ public class MainActivity extends AppCompatActivity {
 
                     if (Integer.parseInt(smsMgr.hours) <= 1) {
                         (view.findViewById(R.id.buttonMinus)).setEnabled(false);
-                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " час");
+                        ((TextView) view.findViewById(R.id.hourText)).setText(String.format(res.getString(R.string.one_hour),smsMgr.hours));
                     } else if (Integer.parseInt(smsMgr.hours) >= 8) {
                         (view.findViewById(R.id.buttonPlus)).setEnabled(false);
-                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " часов");
+                        ((TextView) view.findViewById(R.id.hourText)).setText(String.format(res.getString(R.string.five_hours),smsMgr.hours));
                     } else if (Integer.parseInt(smsMgr.hours) >= 5) {
                         (view.findViewById(R.id.buttonMinus)).setEnabled(true);
                         (view.findViewById(R.id.buttonPlus)).setEnabled(true);
-                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " часов");
+                        ((TextView) view.findViewById(R.id.hourText)).setText(String.format(res.getString(R.string.five_hours),smsMgr.hours));
                     } else {
                         (view.findViewById(R.id.buttonMinus)).setEnabled(true);
                         (view.findViewById(R.id.buttonPlus)).setEnabled(true);
-                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " часа");
+                        ((TextView) view.findViewById(R.id.hourText)).setText(String.format(res.getString(R.string.two_hours),smsMgr.hours));
                     }
                     break;
                 case 3:
@@ -503,7 +493,7 @@ public class MainActivity extends AppCompatActivity {
                     ((TextView) view.findViewById(R.id.regNumText)).setText(smsMgr.regNum);
                     TextView parkNumText =(TextView) view.findViewById(R.id.parkNumText);
                     if (smsMgr.currentZone != null) {
-                        parkNumText.setText(smsMgr.currentZone.getZoneNumber().toString());
+                        parkNumText.setText(String.format(Locale.getDefault(), "%d",smsMgr.currentZone.getZoneNumber()));
                         parkNumText.setTextColor(ContextCompat.getColor(this, R.color.colorMaterialGrey));
 
                     } else {
@@ -513,12 +503,12 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     if (Integer.parseInt(smsMgr.hours) == 1) {
-                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " час");
+                        ((TextView) view.findViewById(R.id.hourText)).setText(String.format(res.getString(R.string.one_hour),smsMgr.hours));
                     }
                     else if ((Integer.parseInt(smsMgr.hours) > 1) && (Integer.parseInt(smsMgr.hours) < 5)) {
-                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " часа");
+                        ((TextView) view.findViewById(R.id.hourText)).setText(String.format(res.getString(R.string.two_hours),smsMgr.hours));
                     } else {
-                        ((TextView) view.findViewById(R.id.hourText)).setText(smsMgr.hours + " часов");
+                        ((TextView) view.findViewById(R.id.hourText)).setText(String.format(res.getString(R.string.five_hours),smsMgr.hours));
                     }
 
                     switch (smsMgr.appStatus) {

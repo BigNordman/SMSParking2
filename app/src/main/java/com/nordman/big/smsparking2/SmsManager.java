@@ -9,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
@@ -19,22 +18,22 @@ import java.util.Date;
  * Created by s_vershinin on 15.01.2016.
  * Класс для формирования целевого СМС-сообщения
  */
-public class SmsManager{
-    public static final long MILLIS_IN_HOUR = 3600000;
+class SmsManager{
+    private static final long MILLIS_IN_HOUR = 3600000;
     private static final long MILLIS_IN_MINUTE = 60000;
 
-    public static final int STATUS_INITIAL = 1;
-    public static final int STATUS_WAITING_OUT = 2;
-    public static final int STATUS_WAITING_IN = 3;
-    public static final int STATUS_SMS_SENT = 4;
-    public static final int STATUS_SMS_NOT_SENT = 5;
-    public static final int STATUS_SMS_NOT_RECEIVED = 6;
-    public static final int STATUS_PARKING = 7;
-    public static final int STATUS_SMS_PERMISSION_NOT_GRANTED = 8;
+    static final int STATUS_INITIAL = 1;
+    static final int STATUS_WAITING_OUT = 2;
+    static final int STATUS_WAITING_IN = 3;
+    static final int STATUS_SMS_SENT = 4;
+    static final int STATUS_SMS_NOT_SENT = 5;
+    static final int STATUS_SMS_NOT_RECEIVED = 6;
+    static final int STATUS_PARKING = 7;
+    static final int STATUS_SMS_PERMISSION_NOT_GRANTED = 8;
     int appStatus = STATUS_INITIAL;
 
-    Context context;
-    GeoManager geoMgr;
+    private Context context;
+    private GeoManager geoMgr;
 
     Date sendDate;
     Date startParkingDate;
@@ -45,13 +44,13 @@ public class SmsManager{
     String hours = "1";
     String statusMessage = "";
 
-    public SmsManager(Context context) {
+    SmsManager(Context context) {
 
         this.context = context;
         geoMgr = new GeoManager(context);
     }
 
-    public void updateSms() {
+    void updateSms() {
         sms = "p66*";
 
         if (currentZone==null) {
@@ -62,7 +61,7 @@ public class SmsManager{
         sms += regNum + "*" + hours;
     }
 
-    public int getProgress(){
+    int getProgress(){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         long lh = Long.parseLong(prefs.getString("LastHours", "1"));
         long lpt = Long.parseLong(prefs.getString("LastParkTime", "0"));
@@ -70,7 +69,7 @@ public class SmsManager{
         return (int) (100 * (lh*MILLIS_IN_HOUR - (current - lpt) )/(lh*MILLIS_IN_HOUR));
     }
 
-    public int getMinutes(){
+    int getMinutes(){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         long lh = Long.parseLong(prefs.getString("LastHours", "1"));
         long lpt = Long.parseLong(prefs.getString("LastParkTime", "0"));
@@ -78,12 +77,12 @@ public class SmsManager{
         return (int) ((lh*MILLIS_IN_HOUR - (current - lpt))/MILLIS_IN_MINUTE);
     }
 
-    public boolean parkingActive(){
+    boolean parkingActive(){
         return (getProgress()>0);
     }
 
     /// отправлена ли смс указанному адресату
-    public boolean IsSent(String toWhom){
+    boolean IsSent(String toWhom){
         boolean result = false;
 
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
@@ -118,7 +117,7 @@ public class SmsManager{
         return result;
     }
 
-    public String GetIncomingSms(String fromWhom){
+    String GetIncomingSms(String fromWhom){
         String result = null;
 
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
@@ -151,7 +150,7 @@ public class SmsManager{
         return result;
     }
 
-    public void startParking() {
+    void startParking() {
         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(context);
         if (startParkingDate==null) startParkingDate=new Date();
         SharedPreferences.Editor ed = prefs.edit();
@@ -162,7 +161,7 @@ public class SmsManager{
         showParkingScreen();
     }
 
-    public void stopParking() {
+    void stopParking() {
         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(context);
         startParkingDate=null;
         appStatus = STATUS_INITIAL;
@@ -175,17 +174,17 @@ public class SmsManager{
         showMainScreen();
     }
 
-    public  void showParkingScreen() {
+    void showParkingScreen() {
         Intent intent = new Intent(context, ParkingActivity.class);
         context.startActivity(intent);
     }
 
-    public  void showMainScreen() {
+    private void showMainScreen() {
         Intent intent = new Intent(context, MainActivity.class);
         context.startActivity(intent);
     }
 
-    public void saveState() {
+    void saveState() {
         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor ed = prefs.edit();
         ed.putString("regNum", regNum);
@@ -198,7 +197,7 @@ public class SmsManager{
         //Log.d("LOG", "...saveState()...");
     }
 
-    public void restoreState() {
+    void restoreState() {
         SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(context);
         regNum = prefs.getString("regNum", "");
         appStatus = prefs.getInt("status", STATUS_INITIAL);
