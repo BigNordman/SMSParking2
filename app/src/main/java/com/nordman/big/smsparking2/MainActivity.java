@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
+import com.nordman.big.smsparkinglib.ParkZone;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -618,7 +619,7 @@ public class MainActivity extends AppCompatActivity {
                 if ((int)((new Date().getTime()-smsMgr.sendDate.getTime())/TICK_INTERVAL)>=(MAX_TICK_WAITING*2)){
                     // время ожидания исходящего смс истекло - все равно переходим на интерфейс "припарковано"
                     /*
-                    smsMgr.appStatus=SmsManager.STATUS_SMS_NOT_RECEIVED;
+                    smsMgr.appStatus=BaseSmsManager.STATUS_SMS_NOT_RECEIVED;
                     smsMgr.saveState();
                     */
                     smsMgr.sendDate = new Date();
